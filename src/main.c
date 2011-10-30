@@ -379,12 +379,9 @@ main(int argc, char *argv[])
         abort_on_error(rc, "main: Failed to install keyboard");
 
     set_color_depth(32);
-    rc = set_gfx_mode(GFX_AUTODETECT_FULLSCREEN, SCREENWIDTH, SCREENHEIGHT, 0, 0);
+    rc = set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREENWIDTH, SCREENHEIGHT, 0, 0);
     if (rc != 0)
         abort_on_error(rc, "main: Unable to set gfx mode");
-
-    if (is_windowed_mode())
-        abort_on_error(rc, "main: Windowed mode not acceptable");
 
     set_window_title("snake");
     render_intro();
