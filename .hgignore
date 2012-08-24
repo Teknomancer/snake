@@ -1,0 +1,10 @@
+syntax: glob
+
+*.make
+Makefile
+Makefile.old
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/*
+Build/
+
