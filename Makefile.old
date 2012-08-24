@@ -1,6 +1,6 @@
 # The directories containing the source files, separated by ':'
 # "VPATH" is a builtin by make, do not rename
-VPATH=src
+VPATH=Src
 
 # Output folder prefix, suffix
 OUT_DIR_PREFIX=_

@@ -10,18 +10,20 @@
 #include <allegro.h>
 #include "list.h"
 
-#define BLOCKSIZE          (4)                      /* game grid block size */
-#define SCREENWIDTH        (640)                    /* screen width in pixels */
-#define SCREENHEIGHT       (480)                    /* screen height in pixels*/
-#define STATUSBAR_HEIGHT   (40)                     /* status bar height in pixels */
-#define WAIT_SLICE         (50)                     /* wait time in millisec. */
-#define WALL_BORDER        (1)                      /* border size of a wall box */
-#define MAX_SNAKE_SIZE     (400)                    /* maximum length of a snake in block size*/
-#define ITEM_WALL_COLOR    makecol(140, 36, 36)
-#define ITEM_SNAKE_COLOR   makecol(184, 135, 122)
-#define ITEM_EMPTY_COLOR   makecol(0, 0, 0)
+#define WAIT_SLICE             (50)                     /* wait time in millisec. */
+#define BLOCKSIZE              (8)                      /* game grid block size */
+#define SCREENWIDTH            (800)                    /* screen width in pixels */
+#define SCREENHEIGHT           (600)                    /* screen height in pixels*/
+#define STATUSBAR_HEIGHT       (40)                     /* status bar height in pixels */
+#define WALL_BORDER            (1)                      /* border size of a wall box */
+#define MAX_SNAKE_SIZE         (400)                    /* maximum length of a snake in block size*/
+#define ITEM_WALL_COLOR        makecol(140, 36, 36)
+#define ITEM_SNAKE_COLOR       makecol(184, 135, 122)
+#define ITEM_SNAKE_COLOR_HEAD  makecol(230, 90,  210)
+#define ITEM_SNAKE_COLOR_TAIL  makecol(199, 150, 177)
+#define ITEM_EMPTY_COLOR       makecol(0, 0, 0)
 
-#define STRINGIFY(x)       #x
+#define STRINGIFY(x)           #x
 
 typedef enum map_item
 {
@@ -198,9 +200,33 @@ render_map()
 
                 case item_snake:
                 {
-                    rectfill(screen,
-                             x, y, x + BLOCKSIZE, y + BLOCKSIZE,
-                             ITEM_SNAKE_COLOR);
+                    int color = ITEM_SNAKE_COLOR;
+                    point *head = ListHead(&g_snakebody);
+                    if (i == head->x && k == head->y)
+                    {
+                        color = ITEM_SNAKE_COLOR;
+                        //circlefill(screen,
+                        //           x + BLOCKSIZE / 2, y + BLOCKSIZE / 2, BLOCKSIZE / 2 + 1,
+                        //           color);
+                        rectfill(screen, x, y, x  + BLOCKSIZE, y + BLOCKSIZE, color);
+                    }
+                    else
+                    {
+                        point *tail = ListTail(&g_snakebody);
+                        if (i == tail->x && k == tail->y)
+                        {
+                            color = ITEM_SNAKE_COLOR;
+                            //circlefill(screen,
+                            //           x + BLOCKSIZE / 2, y + BLOCKSIZE / 2, BLOCKSIZE / 2,
+                            //           color);
+                            rectfill(screen, x, y, x + BLOCKSIZE, y + BLOCKSIZE, color);
+                        }
+                        else
+                            rectfill(screen,
+                                   x, y, x + BLOCKSIZE, y + BLOCKSIZE,
+                                   color);
+                    }
+
                     break;
                 }
             }
