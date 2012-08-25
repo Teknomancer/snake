@@ -10,10 +10,10 @@
 #include <allegro.h>
 #include "list.h"
 
-#define WAIT_SLICE             (50)                     /* wait time in millisec. */
-#define BLOCKSIZE              (8)                      /* game grid block size */
-#define SCREENWIDTH            (800)                    /* screen width in pixels */
-#define SCREENHEIGHT           (600)                    /* screen height in pixels*/
+#define WAIT_SLICE             (60)                     /* wait time in millisec. */
+#define BLOCKSIZE              (12)                     /* game grid block size */
+#define SCREENWIDTH            (1024)                   /* screen width in pixels */
+#define SCREENHEIGHT           (768)                    /* screen height in pixels*/
 #define STATUSBAR_HEIGHT       (40)                     /* status bar height in pixels */
 #define WALL_BORDER            (1)                      /* border size of a wall box */
 #define MAX_SNAKE_SIZE         (400)                    /* maximum length of a snake in block size*/
@@ -238,29 +238,38 @@ render_map()
 int
 process_input()
 {
+    /** @todo this needs work. simultaneous arrow keys not working properly */
     if (key[KEY_UP])
     {
         if (g_snake_dir != dir_down)
+        {
             g_snake_dir = dir_up;
-        return KEY_UP;
+            return KEY_UP;
+        }
     }
     else if (key[KEY_DOWN])
     {
         if (g_snake_dir != dir_up)
+        {
             g_snake_dir = dir_down;
-        return KEY_DOWN;
+            return KEY_DOWN;
+        }
     }
     else if (key[KEY_LEFT])
     {
         if (g_snake_dir != dir_right)
+        {
             g_snake_dir = dir_left;
-        return KEY_LEFT;
+            return KEY_LEFT;
+        }
     }
     else if (key[KEY_RIGHT])
     {
         if (g_snake_dir != dir_left)
+        {
             g_snake_dir = dir_right;
-        return KEY_RIGHT;
+            return KEY_RIGHT;
+        }
     }
     else if (key[KEY_ESC])
     {
@@ -275,17 +284,19 @@ process_input()
 collision_type
 detect_collision(int x, int y)
 {
-    if (g_map[x][y] == item_empty)
-        return collision_none;
-    else if (g_map[x][y] == item_wall)
+    switch (g_map[x][y])
     {
-        printf("collided with %s\n", STRINGIFY(item_wall));
-        return collision_fatal;
-    }
-    else if (g_map[x][y] == item_snake)
-    {
-        printf("collided with %s\n", STRINGIFY(item_snake));
-        return collision_fatal;
+        case item_empty:
+            return collision_none;
+
+        case item_wall:
+            printf("collided with " STRINGIFY(item_wall) "\n");
+            return collision_fatal;
+
+        case item_snake:
+            printf("collided with " STRINGIFY(item_snake) "\n");
+            return collision_fatal;
+
     }
     return collision_unknown;
 }
