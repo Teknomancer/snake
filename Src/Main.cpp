@@ -3,12 +3,29 @@
  * First try at using liballegro and to get a feel of it.
  */
 
+/*
+ * Copyright (C) 2012 Ramshankar (aka Teknomancer)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #include <allegro.h>
-#include "list.h"
+#include "List.h"
 
 #define WAIT_SLICE             (60)                     /* wait time in millisec. */
 #define BLOCKSIZE              (12)                     /* game grid block size */
@@ -84,7 +101,7 @@ destroy_map()
 {
     while (!ListIsEmpty(&g_snakebody))
     {
-        point *snake_point = ListRemoveItemAt(&g_snakebody, 0);
+        point *snake_point = (point *)ListRemoveItemAt(&g_snakebody, 0);
         free(snake_point);
     }
 }
@@ -107,14 +124,14 @@ add_to_snake(int x, int y)
 void
 move_snake_to(int x, int y)
 {
-    point *snake_tail = ListTail(&g_snakebody);
+    point *snake_tail = (point *)ListTail(&g_snakebody);
     if (!snake_tail)
         abort_on_error(-1, "move_snake_to: missing tail");
 
     g_map[snake_tail->x][snake_tail->y] = item_empty;
 
     ListMoveTailToHead(&g_snakebody);
-    point *snake_head = ListHead(&g_snakebody);
+    point *snake_head = (point *)ListHead(&g_snakebody);
     if (!snake_head)
         abort_on_error(-1, "move_snake_to: missing head");
 
@@ -201,7 +218,7 @@ render_map()
                 case item_snake:
                 {
                     int color = ITEM_SNAKE_COLOR;
-                    point *head = ListHead(&g_snakebody);
+                    point *head = (point *)ListHead(&g_snakebody);
                     if (i == head->x && k == head->y)
                     {
                         color = ITEM_SNAKE_COLOR;
@@ -212,7 +229,7 @@ render_map()
                     }
                     else
                     {
-                        point *tail = ListTail(&g_snakebody);
+                        point *tail = (point *)ListTail(&g_snakebody);
                         if (i == tail->x && k == tail->y)
                         {
                             color = ITEM_SNAKE_COLOR;
@@ -238,43 +255,77 @@ render_map()
 int
 process_input()
 {
+#define HANDLE_UP() \
+    do { \
+        if (g_snake_dir != dir_down) \
+        { \
+            g_snake_dir = dir_up; \
+            return KEY_UP; \
+        } \
+    } while (0)
+
+#define HANDLE_LEFT() \
+    do { \
+        if (g_snake_dir != dir_right) \
+        { \
+            g_snake_dir = dir_left; \
+            return KEY_LEFT; \
+        } \
+    } while (0)
+
+#define HANDLE_RIGHT() \
+    do { \
+        if (g_snake_dir != dir_left) \
+        { \
+            g_snake_dir = dir_right; \
+            return KEY_RIGHT; \
+        } \
+    } while (0)
+
+#define HANDLE_DOWN() \
+    do { \
+        if (g_snake_dir != dir_up) \
+        { \
+            g_snake_dir = dir_down; \
+            return KEY_DOWN; \
+        } \
+    } while (0)
+
     /** @todo this needs work. simultaneous arrow keys not working properly */
     if (key[KEY_UP])
     {
-        if (g_snake_dir != dir_down)
-        {
-            g_snake_dir = dir_up;
-            return KEY_UP;
-        }
+        if (key[KEY_LEFT])
+            HANDLE_LEFT();
+        else if (key[KEY_RIGHT])
+            HANDLE_RIGHT();
+        HANDLE_UP();
     }
     else if (key[KEY_DOWN])
     {
-        if (g_snake_dir != dir_up)
-        {
-            g_snake_dir = dir_down;
-            return KEY_DOWN;
-        }
+        if (key[KEY_LEFT])
+            HANDLE_LEFT();
+        else if (key[KEY_RIGHT])
+            HANDLE_RIGHT();
+        HANDLE_DOWN();
     }
     else if (key[KEY_LEFT])
     {
-        if (g_snake_dir != dir_right)
-        {
-            g_snake_dir = dir_left;
-            return KEY_LEFT;
-        }
+        if (key[KEY_UP])
+            HANDLE_UP();
+        else if (key[KEY_DOWN])
+            HANDLE_DOWN();
+        HANDLE_LEFT();
     }
     else if (key[KEY_RIGHT])
     {
-        if (g_snake_dir != dir_left)
-        {
-            g_snake_dir = dir_right;
-            return KEY_RIGHT;
-        }
+        if (key[KEY_UP])
+            HANDLE_UP();
+        else if (key[KEY_DOWN])
+            HANDLE_DOWN();
+        HANDLE_RIGHT();
     }
     else if (key[KEY_ESC])
-    {
         return KEY_ESC;
-    }
 
     clear_keybuf();
     return -1;
@@ -305,7 +356,7 @@ detect_collision(int x, int y)
 collision_type
 update_world()
 {
-    point *snake_head = ListItemAt(&g_snakebody, 0);
+    point *snake_head = (point *)ListItemAt(&g_snakebody, 0);
     if (!snake_head)
         abort_on_error(-1, "update_world: headless snake!");
 
@@ -369,8 +420,8 @@ render_intro()
 
         if (counter > 30)
         {
-            char *game_name = "S N A K E";
-            char *credits = "a game by Tekn0";
+            const char *game_name = "S N A K E";
+            const char *credits = "a game by Tekn0";
 
             acquire_screen();
             hline(screen, box_x, box_y - 2, box_x + box_width + 1, makecol(201, 207, 0));

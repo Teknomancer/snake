@@ -2,7 +2,7 @@
  * Generic double linked list, very simple implementation.
  */
 
-#include "list.h"
+#include "List.h"
 #include <stdlib.h>
 
 void ListInit(PLIST pList)
@@ -48,7 +48,7 @@ static int ListAddNode(PLIST pList, PLISTITEM pNode, void *pvData)
 
 int ListAdd(PLIST pList, void *pvData)
 {
-    PLISTITEM pNode = malloc(sizeof(LISTITEM));
+    PLISTITEM pNode = (PLISTITEM)malloc(sizeof(LISTITEM));
     return ListAddNode(pList, pNode, pvData);
 }
 

@@ -3,10 +3,10 @@ set(EXECUTABLE_OUTPUT_PATH
 )
 
 add_executable(snake
-    "list.c"
-    "main.c"
+    "List.cpp"
+    "Main.cpp"
 )
-add_definitions(-std=c99)
+#add_definitions(-std=c99)
 
 #
 # Allegro
